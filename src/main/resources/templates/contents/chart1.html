@@ -9,6 +9,7 @@
 </head>
 <body>
     <!-- Canvas 엘리먼트를 통해 차트를 그릴 공간을 마련합니다. -->
+<<<<<<< HEAD
     <canvas id="stockChart" width="800" height="400"></canvas>
 
     <script>
@@ -40,6 +41,52 @@
 	}
 	}
 	
+=======
+
+	
+    <canvas id="stockChart" width="800" height="400" style="margin-top: 300px;"></canvas>
+	
+	<select id="ticker">
+	    <option name="BTC" value="BTC" selected="selected">Bitcoin</option>
+	    <option name="ETH" value="ETH">Ethereum</option>
+	    <option name="ADA" value="ADA">Cardano</option>
+	</select>
+	
+    <script>
+
+	let tickerSelect = document.getElementById("ticker")
+
+	document.addEventListener("DOMContentLoaded", async () => {		// select 태그의 값이 바뀌는 것을 감지하기 위해 
+    	await handleFetchDataAndPrepareChart();						// 차트를 그려주는 함수 호출
+
+        $("#ticker").on("change", async () => {						// select 태그의 값이 바뀌는 것을 감지
+            await handleFetchDataAndPrepareChart();					// 바뀐 차트를 다시 그리기 위해 함수 재호출
+        });
+	});
+
+
+	async function fetchData () {									// 예측 가격과 일시 데이터를 요청 및 전달받는 함수
+		let ticker = tickerSelect.value
+		try {
+		    // fetch 함수를 사용하여 지정된 URL로 POST 요청을 보냅니다.
+		    const response = await fetch(`http://127.0.0.1:8000/responsePrice/${ticker}`, {
+		        method: 'GET', 
+		        headers: {
+		            'Content-Type': 'application/json',
+		        },
+		    });
+		    // 응답을 기다리고 JSON으로 파싱합니다.
+		    const result = await response.json();
+		    
+		    return result		// JSON 형식으로 바꾼 데이터를 반환 
+	
+		} catch (error) {
+		    console.error("Error fetching data:", error);
+		    throw error;
+		}};
+		
+
+>>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
 function prepareChartData(result) {
     // chart.js에서 사용할 데이터 형식으로 가공
     const chartData = {
@@ -70,6 +117,7 @@ async function handleFetchDataAndPrepareChart() {
 		
         const result = await fetchData();
         const chartData = prepareChartData(result);
+<<<<<<< HEAD
 		console.log(chartData);
         // 무작위 주가 데이터 생성
         const days = chartData['labels'];
@@ -77,6 +125,15 @@ async function handleFetchDataAndPrepareChart() {
 		//console.log(fetchData());
         // 예측한 주가 데이터 생성 (여기에서는 실제 주가와 동일한 값으로 설정)
         const predictedPrices = chartData['datasets'][0]['data'];
+=======
+		console.log(result);
+        // 무작위 주가 데이터 생성
+        const days = result['days'];
+        const prices = Array.from({ length: 100 }, () => 100 + Math.random());;
+		//console.log(fetchData());
+        // 예측한 주가 데이터 생성 (여기에서는 실제 주가와 동일한 값으로 설정)
+        const predictedPrices = result['pred_price'];
+>>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
         // 차트를 그릴 Canvas 엘리먼트 선택
         const ctx = document.getElementById('stockChart').getContext('2d');
 
@@ -87,17 +144,24 @@ async function handleFetchDataAndPrepareChart() {
                 labels: days,
                 datasets: [
                     {
+<<<<<<< HEAD
                         label: 'Actual Prices',
                         data: predictedPrices,
                         borderColor: 'blue',
                         fill: false
                     },
                     {
+=======
+>>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
                         label: 'Predicted Prices',
                         data: predictedPrices,
                         borderColor: 'red',
                         borderDash: [5, 5],  // 점선으로 예측 부분을 나타냅니다.
+<<<<<<< HEAD
                         fill: false
+=======
+                        fill: true
+>>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
                     }
                 ]
             },
@@ -130,7 +194,11 @@ async function handleFetchDataAndPrepareChart() {
         console.error("Error handling data:", error);
     }
     }
+<<<<<<< HEAD
 handleFetchDataAndPrepareChart()
+=======
+
+>>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
         
     </script>
 </body>
