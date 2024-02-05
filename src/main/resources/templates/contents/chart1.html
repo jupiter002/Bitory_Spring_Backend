@@ -9,44 +9,10 @@
 </head>
 <body>
     <!-- Canvas 엘리먼트를 통해 차트를 그릴 공간을 마련합니다. -->
-<<<<<<< HEAD
-    <canvas id="stockChart" width="800" height="400"></canvas>
-
-    <script>
-	async function fetchData() {
-	try {
-	    // 'data' 객체를 생성하고 key-value 쌍을 설정합니다.
-	    const data = {
-	        key1: "value1",
-	        // FastAPI로 전송할 추가 데이터는 여기에 추가할 수 있습니다.
-	    };
-	
-	    // fetch 함수를 사용하여 지정된 URL로 POST 요청을 보냅니다.
-	    const response = await fetch('http://127.0.0.1:8000/responsePrice', {
-	        method: 'POST',
-	        headers: {
-	            'Content-Type': 'application/json',
-	        },
-	        // 'data'를 JSON 문자열로 변환하여 요청 본문에 포함시킵니다.
-	        body: JSON.stringify(data),
-	    });
-	
-	    // 응답을 기다리고 JSON으로 파싱합니다.
-	    const result = await response.json();
-	    return result
-
-	} catch (error) {
-	    console.error("Error fetching data:", error);
-	    throw error;
-	}
-	}
-	
-=======
-
 	
     <canvas id="stockChart" width="800" height="400" style="margin-top: 300px;"></canvas>
 	
-	<select id="ticker">
+	<select id="ticker">									<!--  -->
 	    <option name="BTC" value="BTC" selected="selected">Bitcoin</option>
 	    <option name="ETH" value="ETH">Ethereum</option>
 	    <option name="ADA" value="ADA">Cardano</option>
@@ -86,119 +52,110 @@
 		}};
 		
 
->>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
-function prepareChartData(result) {
-    // chart.js에서 사용할 데이터 형식으로 가공
-    const chartData = {
-        labels: result['days'],
-        datasets: [{
-            label: "My Chart",
-            data: result['pred_price'],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)'
-                // 추가적인 색상 설정 가능
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)'
-                // 추가적인 색상 설정 가능
-            ],
-            borderWidth: 1
-        }]
-    };
+	function prepareChartData(result) {
+	    // chart.js에서 사용할 데이터 형식으로 가공
+	    const chartData = {
+	        labels: result['days'],
+	        datasets: [{
+	            label: "My Chart",
+	            data: result['pred_price'],
+	            backgroundColor: [
+	                'rgba(255, 99, 132, 0.2)',
+	                'rgba(54, 162, 235, 0.2)',
+	                'rgba(255, 206, 86, 0.2)'
+	                // 추가적인 색상 설정 가능
+	            ],
+	            borderColor: [
+	                'rgba(255,99,132,1)',
+	                'rgba(54, 162, 235, 1)',
+	                'rgba(255, 206, 86, 1)'
+	                // 추가적인 색상 설정 가능
+	            ],
+	            borderWidth: 1
+	        }]
+	    };
+	
+	    return chartData;
+	}
+	
+	async function handleFetchDataAndPrepareChart() {
+	    try {
+			
+	        const result = await fetchData();
+			console.log(result);
+	        // 무작위 주가 데이터 생성
+	        const days = result['days'];
+			//console.log(fetchData());
+	        // 예측한 주가 데이터 생성 (여기에서는 실제 주가와 동일한 값으로 설정)
+	        const predictedPrices = result['pred_price'];
+	        const realPrices = result['real_price'];
+	        // 차트를 그릴 Canvas 엘리먼트 선택
+	        const ctx = document.getElementById('stockChart').getContext('2d');
+	        
+			let chartStatus = Chart.getChart('stockChart');
+			
+			if (chartStatus !== undefined) {
+			  chartStatus.destroy();
+				}
+	        // Chart.js를 사용하여 선 그래프를 그립니다.
+	        const stockChart = new Chart(ctx, {
+	            type: 'line',
+	            data: {
+	                labels: days,
+	                datasets: [
+	                	{
+	                        label: '실제 주가',
+	                        data: realPrices,
+	                        borderColor: 'blue',
+	                        borderDash: [5, 5],  // 점선으로 예측 부분을 나타냅니다.
+	                        fill: false
+	                    },
+	                    {
+	                        label: '예측 주가',
+	                        data: predictedPrices,
+	                        borderColor: 'green',
+	                        borderDash: [5, 5],  // 점선으로 예측 부분을 나타냅니다.
+	                        fill: false
+	                    }
+	                ]
+	            },
+	            options: {
+	                title: {
+	                    display: true,
+	                    text: 'Actual vs Predicted Stock Prices'
+	                },
+	                scales: {
+	                    xAxes: [{
+	                        scaleLabel: {
+	                            display: true,
+	                            labelString: 'Days'
+	                        }
+	                    }],
+	                    yAxes: [{
+	                        scaleLabel: {
+	                            display: true,
+	                            labelString: 'Stock Prices'
+	                        }
+	                    }]
+	                },
+	                animation: {
+			            duration: 0 // 일반적 애니메이션 시간
+			        },
+			        hover: {
+			            animationDuration: 0 // 항목을 호버했을 때 애니메이션 지속 시간
+			        },
+			        responsiveAnimationDuration: 0, // 크기 변경 후 애니메이션 지속 시간
+	                legend: {
+	                    display: true,
+	                    position: 'top'
+	                }
+	            }
+	        });
+	        }catch (error) {
+	        console.error("Error handling data:", error);
+	    }
+	    }
 
-    return chartData;
-}
-async function handleFetchDataAndPrepareChart() {
-    try {
-		
-        const result = await fetchData();
-        const chartData = prepareChartData(result);
-<<<<<<< HEAD
-		console.log(chartData);
-        // 무작위 주가 데이터 생성
-        const days = chartData['labels'];
-        const prices = Array.from({ length: 100 }, () => 100 + Math.random());;
-		//console.log(fetchData());
-        // 예측한 주가 데이터 생성 (여기에서는 실제 주가와 동일한 값으로 설정)
-        const predictedPrices = chartData['datasets'][0]['data'];
-=======
-		console.log(result);
-        // 무작위 주가 데이터 생성
-        const days = result['days'];
-        const prices = Array.from({ length: 100 }, () => 100 + Math.random());;
-		//console.log(fetchData());
-        // 예측한 주가 데이터 생성 (여기에서는 실제 주가와 동일한 값으로 설정)
-        const predictedPrices = result['pred_price'];
->>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
-        // 차트를 그릴 Canvas 엘리먼트 선택
-        const ctx = document.getElementById('stockChart').getContext('2d');
-
-        // Chart.js를 사용하여 선 그래프를 그립니다.
-        const stockChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: days,
-                datasets: [
-                    {
-<<<<<<< HEAD
-                        label: 'Actual Prices',
-                        data: predictedPrices,
-                        borderColor: 'blue',
-                        fill: false
-                    },
-                    {
-=======
->>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
-                        label: 'Predicted Prices',
-                        data: predictedPrices,
-                        borderColor: 'red',
-                        borderDash: [5, 5],  // 점선으로 예측 부분을 나타냅니다.
-<<<<<<< HEAD
-                        fill: false
-=======
-                        fill: true
->>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
-                    }
-                ]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Actual vs Predicted Stock Prices'
-                },
-                scales: {
-                    xAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Days'
-                        }
-                    }],
-                    yAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Stock Prices'
-                        }
-                    }]
-                },
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
-            }
-        });
-        }catch (error) {
-        console.error("Error handling data:", error);
-    }
-    }
-<<<<<<< HEAD
-handleFetchDataAndPrepareChart()
-=======
-
->>>>>>> 2ee29de13095f8e8e891b8db975e54d23450f91d
         
     </script>
 </body>
